@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwiftNote - Capture the web, instantly</title>
+  <link rel="icon" type="image/png" href="icons/icon48.png">
+  <meta name="description" content="Save selected text and screenshots from any webpage to organized notes with cloud backup">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #fafafa;
+      --border-color: #e8e8e8;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --text-tertiary: #999999;
+      --accent-color: #2c2c2c;
+      --accent-hover: #1a1a1a;
+    }
+    
+    body {
+      font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "San Francisco", 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logo {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .brand-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 15px;
+      transition: color 0.2s ease;
+    }
+    
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+    
+    .cta-button {
+      background: var(--accent-color);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .cta-button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    /* Hero Section */
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+      text-align: center;
+    }
+    
+    .hero-icon {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 32px;
+      display: block;
+    }
+    
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+    }
+    
+    .hero-slogan {
+      font-size: 28px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    
+    .hero-description {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .primary-button {
+      background: var(--accent-color);
+      color: white;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .primary-button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .secondary-button {
+      background: transparent;
+      color: var(--text-primary);
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .secondary-button:hover {
+      border-color: var(--text-secondary);
+      transform: translateY(-2px);
+    }
+    
+    /* Features Section */
+    .features-section {
+      max-width: 1200px;
+      margin: 80px auto;
+      padding: 0 24px;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 60px;
+      letter-spacing: -0.8px;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    
+    .feature-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 32px;
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      border-color: var(--text-secondary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    }
+    
+    .feature-icon {
+      font-size: 36px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    
+    .feature-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    
+    .feature-description {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    
+    /* Demo Section */
+    .demo-section {
+      max-width: 1000px;
+      margin: 100px auto;
+      padding: 0 24px;
+      text-align: center;
+    }
+    
+    .demo-video-placeholder {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 80px 40px;
+      margin-top: 40px;
+    }
+    
+    .demo-placeholder-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    .demo-placeholder-text {
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      max-width: 800px;
+      margin: 120px auto;
+      padding: 60px 24px;
+      text-align: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+    }
+    
+    .cta-section h2 {
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      letter-spacing: -0.8px;
+    }
+    
+    .cta-section p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+    
+    /* Feedback Section */
+    .feedback-section {
+      max-width: 800px;
+      margin: 100px auto;
+      padding: 60px 24px;
+      text-align: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+    }
+    
+    .feedback-section h2 {
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      letter-spacing: -0.8px;
+    }
+    
+    .feedback-section p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+    
+    .feedback-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .feedback-email:hover {
+      border-color: var(--text-secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+    }
+    
+    /* Footer */
+    .footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 24px 40px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s ease;
+    }
+    
+    .footer-links a:hover {
+      color: var(--text-primary);
+    }
+    
+    .footer-text {
+      color: var(--text-tertiary);
+      font-size: 13px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 40px;
+      }
+      
+      .hero-slogan {
+        font-size: 22px;
+      }
+      
+      .hero-description {
+        font-size: 16px;
+      }
+      
+      .section-title {
+        font-size: 28px;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <img src="icons/icon48.png" alt="SwiftNote" class="logo">
+        <span class="brand-name">SwiftNote</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#feedback">Feedback</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <img src="icons/icon128.png" alt="SwiftNote Icon" class="hero-icon">
+    <h1>SwiftNote</h1>
+    <p class="hero-slogan">Capture the web, instantly</p>
+    <p class="hero-description">Save selected text and screenshots from any webpage to organized notes with cloud backup</p>
+    <div class="hero-buttons">
+      <a href="https://chromewebstore.google.com/detail/swiftnote/ijklnnmanelhghagcohfgeppmfinfjgf" target="_blank" class="primary-button">
+        <span>🚀</span>
+        <span>Add to Chrome - It's Free</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <h2 class="section-title">Everything you need</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">📝</span>
+        <h3 class="feature-title">Quick Text Save</h3>
+        <p class="feature-description">Select any text on a webpage and save it instantly with context menu or right-click</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📸</span>
+        <h3 class="feature-title">Screenshot Capture</h3>
+        <p class="feature-description">Press Ctrl/Cmd+Shift+S to capture any part of the screen with precise selection</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🗂️</span>
+        <h3 class="feature-title">Smart Organization</h3>
+        <p class="feature-description">Notes automatically grouped by webpage with search and filter capabilities</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🔍</span>
+        <h3 class="feature-title">Fast Search</h3>
+        <p class="feature-description">Find any note in seconds with powerful search across all your saved content</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📤</span>
+        <h3 class="feature-title">Multiple Exports</h3>
+        <p class="feature-description">Export notes as Markdown, HTML, or PDF with images and metadata</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">☁️</span>
+        <h3 class="feature-title">Cloud Backup</h3>
+        <p class="feature-description">Sync your notes to Google Drive with one-click backup and restore</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🎨</span>
+        <h3 class="feature-title">Clean Interface</h3>
+        <p class="feature-description">Minimalist design with side panel that doesn't interrupt your workflow</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🌐</span>
+        <h3 class="feature-title">Works Everywhere</h3>
+        <p class="feature-description">Save from any website - news, research, social media, documentation</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3 class="feature-title">Privacy First</h3>
+        <p class="feature-description">Your data stays local by default. Cloud sync is optional and encrypted</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feedback Section -->
+  <section class="feedback-section" id="feedback">
+    <h2>We'd love to hear from you</h2>
+    <p>Have questions, suggestions, or found a bug? Send us your feedback and help make SwiftNote better.</p>
+    <a href="mailto:song_yiming@hotmail.com?subject=SwiftNote%20Feedback" class="feedback-email">
+      <span>✉️</span>
+      <span>song_yiming@hotmail.com</span>
+    </a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-text">© 2025 SwiftNote. All rights reserved.</p>
+  </footer>
+</body>
+</html>
+
